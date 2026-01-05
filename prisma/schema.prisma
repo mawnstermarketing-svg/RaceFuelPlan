@@ -1,0 +1,59 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String         @id @default(cuid())
+  email             String         @unique
+  password          String
+  createdAt         DateTime       @default(now())
+  stripeCustomerId  String?        @unique
+
+  plans             Plan[]
+  purchases         Purchase[]
+  subscriptions     Subscription[]
+}
+
+model Plan {
+  id          String     @id @default(cuid())
+  userId      String?
+  user        User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt   DateTime   @default(now())
+  inputsJson  String     // JSON string
+  outputsJson String     // JSON string
+  title       String
+  accessType  String     @default("FREE_VIEW_ONLY") // FREE_VIEW_ONLY | ONE_TIME_UNLOCKED | ANNUAL_UNLOCKED
+
+  purchases   Purchase[]
+}
+
+model Purchase {
+  id                      String         @id @default(cuid())
+  userId                  String
+  user                    User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  planId                  String?
+  plan                    Plan?          @relation(fields: [planId], references: [id], onDelete: SetNull)
+  stripeCheckoutSessionId String         @unique
+  type                    String         // ONE_TIME | ANNUAL
+  status                  String         @default("PENDING") // PENDING | PAID | FAILED | REFUNDED
+  createdAt               DateTime       @default(now())
+}
+
+model Subscription {
+  id                   String             @id @default(cuid())
+  userId               String             @unique
+  user                 User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stripeSubscriptionId String             @unique
+  status               String             // ACTIVE | CANCELED | PAST_DUE | INCOMPLETE
+  currentPeriodEnd     DateTime
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+}
