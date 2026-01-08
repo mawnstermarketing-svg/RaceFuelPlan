@@ -20,7 +20,10 @@ import {
   Crown,
   Check,
   Eye,
-  EyeOff
+  EyeOff,
+  Calendar,
+  CheckSquare,
+  Package
 } from "lucide-react";
 import { PlanInput, PlanOutput } from "@/lib/types";
 import { generateFuelingPlan } from "@/lib/planGenerator";
@@ -43,6 +46,8 @@ import {
 import { ProductRecommendations } from "@/components/ProductRecommendations";
 import { SweatRateTest } from "@/components/SweatRateTest";
 import { SweatProfileQuestionnaire, SweatProfile } from "@/components/SweatProfileQuestionnaire";
+import { RaceWeekPlanner } from "@/components/RaceWeekPlanner";
+import { PackingChecklist } from "@/components/PackingChecklist";
 
 const distanceOptions = [
   { value: "13.1", label: "Half Marathon (13.1 mi)" },
@@ -91,6 +96,10 @@ export default function CalculatorPage() {
   const [showSweatQuestionnaire, setShowSweatQuestionnaire] = useState(false);
   const [sweatRateResult, setSweatRateResult] = useState<number | null>(null);
   const [sweatProfile, setSweatProfile] = useState<SweatProfile | null>(null);
+
+  // Race prep tools states
+  const [showRaceWeekPlanner, setShowRaceWeekPlanner] = useState(false);
+  const [showPackingChecklist, setShowPackingChecklist] = useState(false);
 
   const formattedGoalTime = useMemo(() => {
     const minutes = formData.goalTimeMinutes || 0;
@@ -642,6 +651,51 @@ export default function CalculatorPage() {
                   onUnlockClick={() => setShowPaywall(true)}
                 />
 
+                {/* Race Prep Tools */}
+                <Card variant="elevated" padding="md" className="relative overflow-hidden">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                      <Package className="w-5 h-5 text-primary-500" />
+                      <h3 className="font-semibold text-slate-900 dark:text-white">Race Prep Tools</h3>
+                    </div>
+                    <Badge variant="warning" size="sm" icon={<Lock className="w-3 h-3" />}>
+                      Premium
+                    </Badge>
+                  </div>
+                  <div className="grid sm:grid-cols-2 gap-3">
+                    <button
+                      onClick={() => setShowPaywall(true)}
+                      className="relative flex items-center gap-3 p-4 rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 transition-all text-left group"
+                    >
+                      <div className="w-12 h-12 rounded-xl bg-white dark:bg-slate-800 shadow-sm flex items-center justify-center">
+                        <Calendar className="w-6 h-6 text-slate-400 dark:text-slate-500" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="font-semibold text-slate-500 dark:text-slate-400">Race Week Planner</div>
+                        <div className="text-sm text-slate-400 dark:text-slate-500">7-day nutrition guide</div>
+                      </div>
+                      <Lock className="w-4 h-4 text-slate-400 dark:text-slate-500" />
+                    </button>
+
+                    <button
+                      onClick={() => setShowPaywall(true)}
+                      className="relative flex items-center gap-3 p-4 rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 transition-all text-left group"
+                    >
+                      <div className="w-12 h-12 rounded-xl bg-white dark:bg-slate-800 shadow-sm flex items-center justify-center">
+                        <CheckSquare className="w-6 h-6 text-slate-400 dark:text-slate-500" />
+                      </div>
+                      <div className="flex-1">
+                        <div className="font-semibold text-slate-500 dark:text-slate-400">Packing Checklist</div>
+                        <div className="text-sm text-slate-400 dark:text-slate-500">Race day essentials</div>
+                      </div>
+                      <Lock className="w-4 h-4 text-slate-400 dark:text-slate-500" />
+                    </button>
+                  </div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 text-center mt-3">
+                    Unlock with any paid plan to access race prep tools
+                  </p>
+                </Card>
+
                 {/* Action Buttons - Only show for non-paywalled or demo */}
                 <Card variant="filled" padding="md">
                   <div className="flex flex-col sm:flex-row gap-3">
@@ -737,7 +791,11 @@ export default function CalculatorPage() {
                 </li>
                 <li className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
                   <Check className="w-4 h-4 text-success-500" />
-                  Lifetime access
+                  Race week nutrition planner
+                </li>
+                <li className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                  <Check className="w-4 h-4 text-success-500" />
+                  Packing checklist generator
                 </li>
               </ul>
               <Link href="/pricing" className="block">
@@ -766,11 +824,15 @@ export default function CalculatorPage() {
                 </li>
                 <li className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
                   <Check className="w-4 h-4 text-success-500" />
-                  Priority support
+                  All race prep tools included
                 </li>
                 <li className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
                   <Check className="w-4 h-4 text-success-500" />
-                  Early access to features
+                  Product recommendations
+                </li>
+                <li className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                  <Check className="w-4 h-4 text-success-500" />
+                  Priority support
                 </li>
               </ul>
               <Link href="/pricing" className="block">
@@ -826,6 +888,36 @@ export default function CalculatorPage() {
             <SweatProfileQuestionnaire
               onComplete={handleSweatProfileComplete}
               onClose={() => setShowSweatQuestionnaire(false)}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Race Week Planner Modal */}
+      {showRaceWeekPlanner && result && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
+          <div className="w-full max-w-3xl">
+            <RaceWeekPlanner
+              bodyWeightLb={formData.bodyWeightLb || 150}
+              raceDurationMinutes={result.raceDurationMinutes}
+              raceDistance={formData.distance || 26.2}
+              onClose={() => setShowRaceWeekPlanner(false)}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Packing Checklist Modal */}
+      {showPackingChecklist && result && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
+          <div className="w-full max-w-2xl">
+            <PackingChecklist
+              plan={result}
+              raceDistance={formData.distance || 26.2}
+              temperatureF={formData.temperatureF || 60}
+              fuelType={formData.fuelType || "gels"}
+              raceName={selectedRace?.name}
+              onClose={() => setShowPackingChecklist(false)}
             />
           </div>
         </div>

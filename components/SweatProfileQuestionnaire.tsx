@@ -217,44 +217,44 @@ export function SweatProfileQuestionnaire({ onComplete, onClose }: SweatProfileQ
     return (
       <Card className="p-6 max-w-2xl mx-auto">
         <div className="text-center mb-6">
-          <div className="w-16 h-16 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <svg className="w-8 h-8 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div className="w-16 h-16 bg-primary-100 dark:bg-primary-900/50 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-primary-600 dark:text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 mb-2">Your Sweat Profile</h2>
-          <p className="text-gray-600">Based on your answers, here's your personalized profile</p>
+          <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">Your Sweat Profile</h2>
+          <p className="text-gray-600 dark:text-gray-300">Based on your answers, here's your personalized profile</p>
         </div>
 
         {/* Profile Summary */}
         <div className="grid grid-cols-2 gap-4 mb-6">
-          <div className="bg-blue-50 rounded-lg p-4 text-center">
-            <div className="text-sm text-blue-600 font-medium mb-1">Sweat Volume</div>
-            <div className="text-xl font-bold text-blue-900 capitalize">{profile.sweatAmount}</div>
+          <div className="bg-blue-50 dark:bg-blue-900/30 rounded-lg p-4 text-center">
+            <div className="text-sm text-blue-600 dark:text-blue-400 font-medium mb-1">Sweat Volume</div>
+            <div className="text-xl font-bold text-blue-900 dark:text-blue-100 capitalize">{profile.sweatAmount}</div>
           </div>
-          <div className="bg-orange-50 rounded-lg p-4 text-center">
-            <div className="text-sm text-orange-600 font-medium mb-1">Sodium Needs</div>
-            <div className="text-xl font-bold text-orange-900 capitalize">{profile.sodiumNeeds}</div>
+          <div className="bg-orange-50 dark:bg-orange-900/30 rounded-lg p-4 text-center">
+            <div className="text-sm text-orange-600 dark:text-orange-400 font-medium mb-1">Sodium Needs</div>
+            <div className="text-xl font-bold text-orange-900 dark:text-orange-100 capitalize">{profile.sodiumNeeds}</div>
           </div>
-          <div className="bg-red-50 rounded-lg p-4 text-center">
-            <div className="text-sm text-red-600 font-medium mb-1">Heat Sensitivity</div>
-            <div className="text-xl font-bold text-red-900 capitalize">{profile.heatSensitivity}</div>
+          <div className="bg-red-50 dark:bg-red-900/30 rounded-lg p-4 text-center">
+            <div className="text-sm text-red-600 dark:text-red-400 font-medium mb-1">Heat Sensitivity</div>
+            <div className="text-xl font-bold text-red-900 dark:text-red-100 capitalize">{profile.heatSensitivity}</div>
           </div>
-          <div className="bg-purple-50 rounded-lg p-4 text-center">
-            <div className="text-sm text-purple-600 font-medium mb-1">Cramp Risk</div>
-            <div className="text-xl font-bold text-purple-900 capitalize">{profile.crampRisk}</div>
+          <div className="bg-purple-50 dark:bg-purple-900/30 rounded-lg p-4 text-center">
+            <div className="text-sm text-purple-600 dark:text-purple-400 font-medium mb-1">Cramp Risk</div>
+            <div className="text-xl font-bold text-purple-900 dark:text-purple-100 capitalize">{profile.crampRisk}</div>
           </div>
         </div>
 
         {/* Sodium Target */}
-        <div className="bg-gray-50 rounded-lg p-4 mb-6">
-          <h3 className="font-semibold text-gray-900 mb-2">Suggested Sodium Range</h3>
-          <div className="text-2xl font-bold text-primary-600">
+        <div className="bg-gray-50 dark:bg-slate-700/50 rounded-lg p-4 mb-6">
+          <h3 className="font-semibold text-gray-900 dark:text-white mb-2">Suggested Sodium Range</h3>
+          <div className="text-2xl font-bold text-primary-600 dark:text-primary-400">
             {profile.sodiumNeeds === 'low' && '300-500 mg/hour'}
             {profile.sodiumNeeds === 'medium' && '500-700 mg/hour'}
             {profile.sodiumNeeds === 'high' && '700-1000+ mg/hour'}
           </div>
-          <p className="text-sm text-gray-600 mt-1">
+          <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
             {profile.sodiumNeeds === 'low' && 'Your sodium losses appear typical. Standard sports drinks should meet your needs.'}
             {profile.sodiumNeeds === 'medium' && 'You have moderate sodium needs. Consider sodium-enhanced drinks in hot conditions.'}
             {profile.sodiumNeeds === 'high' && 'You\'re a salty sweater. Plan for extra sodium, especially in longer or hotter races.'}
@@ -263,14 +263,14 @@ export function SweatProfileQuestionnaire({ onComplete, onClose }: SweatProfileQ
 
         {/* Recommendations */}
         <div className="mb-6">
-          <h3 className="font-semibold text-gray-900 mb-3">Personalized Recommendations</h3>
+          <h3 className="font-semibold text-gray-900 dark:text-white mb-3">Personalized Recommendations</h3>
           <ul className="space-y-2">
             {profile.recommendations.map((rec, index) => (
               <li key={index} className="flex items-start gap-2">
-                <svg className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-5 h-5 text-green-500 dark:text-green-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
-                <span className="text-gray-700">{rec}</span>
+                <span className="text-gray-700 dark:text-gray-200">{rec}</span>
               </li>
             ))}
           </ul>
@@ -286,7 +286,7 @@ export function SweatProfileQuestionnaire({ onComplete, onClose }: SweatProfileQ
           </Button>
         </div>
 
-        <p className="text-xs text-gray-500 text-center mt-4">
+        <p className="text-xs text-gray-500 dark:text-gray-400 text-center mt-4">
           This questionnaire provides estimates. For precise data, complete a home sweat rate test.
         </p>
       </Card>
@@ -300,12 +300,12 @@ export function SweatProfileQuestionnaire({ onComplete, onClose }: SweatProfileQ
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-xl font-bold text-gray-900">Sweat Profile Quiz</h2>
-          <p className="text-sm text-gray-500">Question {currentQuestion + 1} of {questions.length}</p>
+          <h2 className="text-xl font-bold text-gray-900 dark:text-white">Sweat Profile Quiz</h2>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Question {currentQuestion + 1} of {questions.length}</p>
         </div>
         <button
           onClick={onClose}
-          className="text-gray-400 hover:text-gray-600 transition-colors"
+          className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300 transition-colors"
         >
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -314,7 +314,7 @@ export function SweatProfileQuestionnaire({ onComplete, onClose }: SweatProfileQ
       </div>
 
       {/* Progress Bar */}
-      <div className="w-full bg-gray-200 rounded-full h-2 mb-6">
+      <div className="w-full bg-gray-200 dark:bg-slate-700 rounded-full h-2 mb-6">
         <div
           className="bg-primary-600 h-2 rounded-full transition-all duration-300"
           style={{ width: `${progress}%` }}
@@ -323,8 +323,8 @@ export function SweatProfileQuestionnaire({ onComplete, onClose }: SweatProfileQ
 
       {/* Question */}
       <div className="mb-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-2">{question.question}</h3>
-        <p className="text-gray-600 text-sm">{question.description}</p>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">{question.question}</h3>
+        <p className="text-gray-600 dark:text-gray-300 text-sm">{question.description}</p>
       </div>
 
       {/* Options */}
@@ -333,15 +333,15 @@ export function SweatProfileQuestionnaire({ onComplete, onClose }: SweatProfileQ
           <button
             key={option.value}
             onClick={() => handleAnswer(option.value)}
-            className="w-full text-left p-4 rounded-lg border-2 border-gray-200 hover:border-primary-500 hover:bg-primary-50 transition-all duration-200 group"
+            className="w-full text-left p-4 rounded-lg border-2 border-gray-200 dark:border-slate-600 hover:border-primary-500 hover:bg-primary-50 dark:hover:bg-primary-900/30 transition-all duration-200 group"
           >
             <div className="flex items-center gap-3">
-              <div className="w-6 h-6 rounded-full border-2 border-gray-300 group-hover:border-primary-500 flex items-center justify-center flex-shrink-0">
+              <div className="w-6 h-6 rounded-full border-2 border-gray-300 dark:border-slate-500 group-hover:border-primary-500 flex items-center justify-center flex-shrink-0">
                 <div className="w-3 h-3 rounded-full bg-transparent group-hover:bg-primary-500" />
               </div>
               <div>
-                <div className="font-medium text-gray-900">{option.label}</div>
-                <div className="text-sm text-gray-500">{option.description}</div>
+                <div className="font-medium text-gray-900 dark:text-white">{option.label}</div>
+                <div className="text-sm text-gray-500 dark:text-gray-400">{option.description}</div>
               </div>
             </div>
           </button>
@@ -352,7 +352,7 @@ export function SweatProfileQuestionnaire({ onComplete, onClose }: SweatProfileQ
       {currentQuestion > 0 && (
         <button
           onClick={() => setCurrentQuestion(currentQuestion - 1)}
-          className="mt-6 text-gray-500 hover:text-gray-700 text-sm flex items-center gap-1"
+          className="mt-6 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 text-sm flex items-center gap-1"
         >
           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
