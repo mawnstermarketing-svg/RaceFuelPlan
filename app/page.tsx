@@ -27,6 +27,8 @@ import {
 } from "lucide-react";
 import { Button, Card, Badge, Navbar } from "@/components/ui";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { BonkCalculator } from "@/components/BonkCalculator";
 
 const features = [
   {
@@ -133,6 +135,7 @@ const emailSequence = [
 
 export default function HomePage() {
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  const router = useRouter();
 
   return (
     <div className="min-h-screen bg-slate-950">
@@ -257,6 +260,26 @@ export default function HomePage() {
               </Card>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Bonk Calculator Section */}
+      <section className="py-16 bg-gradient-to-b from-slate-950 to-slate-900">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-8">
+            <Badge variant="warning" size="lg" className="mb-4">
+              Free Tool
+            </Badge>
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+              Will You <span className="text-warning-400">Hit the Wall</span>?
+            </h2>
+            <p className="text-slate-400 max-w-2xl mx-auto">
+              Most marathoners bonk because they underestimate their carb needs.
+              See exactly when YOUR glycogen stores will run out.
+            </p>
+          </div>
+
+          <BonkCalculator onGetPlan={() => router.push('/calculator')} />
         </div>
       </section>
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import {
   Zap,
@@ -23,7 +23,8 @@ import {
   EyeOff,
   Calendar,
   CheckSquare,
-  Package
+  Package,
+  Activity
 } from "lucide-react";
 import { PlanInput, PlanOutput } from "@/lib/types";
 import { generateFuelingPlan } from "@/lib/planGenerator";
@@ -48,6 +49,8 @@ import { SweatRateTest } from "@/components/SweatRateTest";
 import { SweatProfileQuestionnaire, SweatProfile } from "@/components/SweatProfileQuestionnaire";
 import { RaceWeekPlanner } from "@/components/RaceWeekPlanner";
 import { PackingChecklist } from "@/components/PackingChecklist";
+import { GutTrainingProtocol } from "@/components/GutTrainingProtocol";
+import { TrainingPlan } from "@/components/TrainingPlan";
 
 const distanceOptions = [
   { value: "13.1", label: "Half Marathon (13.1 mi)" },
@@ -100,6 +103,27 @@ export default function CalculatorPage() {
   // Race prep tools states
   const [showRaceWeekPlanner, setShowRaceWeekPlanner] = useState(false);
   const [showPackingChecklist, setShowPackingChecklist] = useState(false);
+  const [showGutTraining, setShowGutTraining] = useState(false);
+  const [showTrainingPlan, setShowTrainingPlan] = useState(false);
+
+  // Subscription state
+  const [isPaidUser, setIsPaidUser] = useState(false);
+
+  // Check subscription status on mount
+  useEffect(() => {
+    const checkSubscription = async () => {
+      try {
+        const res = await fetch("/api/subscription");
+        if (res.ok) {
+          const data = await res.json();
+          setIsPaidUser(data.hasAccess);
+        }
+      } catch (error) {
+        console.error("Error checking subscription:", error);
+      }
+    };
+    checkSubscription();
+  }, []);
 
   const formattedGoalTime = useMemo(() => {
     const minutes = formData.goalTimeMinutes || 0;
@@ -509,9 +533,15 @@ export default function CalculatorPage() {
                         title="Your Fueling Schedule"
                         subtitle={`${result.fuelingSchedule.length} fueling actions planned`}
                       />
-                      <Badge variant="warning" size="sm" icon={<Eye className="w-3 h-3" />}>
-                        Preview Mode
-                      </Badge>
+                      {isPaidUser ? (
+                        <Badge variant="success" size="sm" icon={<Check className="w-3 h-3" />}>
+                          Full Access
+                        </Badge>
+                      ) : (
+                        <Badge variant="warning" size="sm" icon={<Eye className="w-3 h-3" />}>
+                          Preview Mode
+                        </Badge>
+                      )}
                     </div>
                   </div>
 
@@ -532,8 +562,8 @@ export default function CalculatorPage() {
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-200 dark:divide-slate-700">
-                        {/* Free preview actions */}
-                        {result.fuelingSchedule.slice(0, FREE_PREVIEW_ACTIONS).map((action, idx) => (
+                        {/* Show all actions for paid users, preview for free */}
+                        {(isPaidUser ? result.fuelingSchedule : result.fuelingSchedule.slice(0, FREE_PREVIEW_ACTIONS)).map((action, idx) => (
                           <tr
                             key={idx}
                             className="hover:bg-slate-50 dark:hover:bg-slate-800/30 transition-colors"
@@ -554,8 +584,8 @@ export default function CalculatorPage() {
                           </tr>
                         ))}
 
-                        {/* Blurred/locked actions preview */}
-                        {lockedActionsCount > 0 && (
+                        {/* Blurred/locked actions preview - only for free users */}
+                        {!isPaidUser && lockedActionsCount > 0 && (
                           <>
                             {result.fuelingSchedule.slice(FREE_PREVIEW_ACTIONS, FREE_PREVIEW_ACTIONS + 2).map((action, idx) => (
                               <tr
@@ -583,8 +613,8 @@ export default function CalculatorPage() {
                     </table>
                   </div>
 
-                  {/* Locked Actions Overlay */}
-                  {lockedActionsCount > 0 && (
+                  {/* Locked Actions Overlay - only for free users */}
+                  {!isPaidUser && lockedActionsCount > 0 && (
                     <div className="relative">
                       {/* Gradient fade */}
                       <div className="absolute -top-16 left-0 right-0 h-16 bg-gradient-to-t from-white dark:from-slate-800 to-transparent pointer-events-none" />
@@ -647,7 +677,7 @@ export default function CalculatorPage() {
                   temperatureF={formData.temperatureF || 60}
                   fuelType={formData.fuelType || "gels"}
                   stomachTolerance={formData.stomachTolerance || "medium"}
-                  isPaid={false}
+                  isPaid={isPaidUser}
                   onUnlockClick={() => setShowPaywall(true)}
                 />
 
@@ -658,42 +688,102 @@ export default function CalculatorPage() {
                       <Package className="w-5 h-5 text-primary-500" />
                       <h3 className="font-semibold text-slate-900 dark:text-white">Race Prep Tools</h3>
                     </div>
-                    <Badge variant="warning" size="sm" icon={<Lock className="w-3 h-3" />}>
-                      Premium
-                    </Badge>
+                    {isPaidUser ? (
+                      <Badge variant="success" size="sm" icon={<Check className="w-3 h-3" />}>
+                        Unlocked
+                      </Badge>
+                    ) : (
+                      <Badge variant="warning" size="sm" icon={<Lock className="w-3 h-3" />}>
+                        Premium
+                      </Badge>
+                    )}
                   </div>
-                  <div className="grid sm:grid-cols-2 gap-3">
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                     <button
-                      onClick={() => setShowPaywall(true)}
-                      className="relative flex items-center gap-3 p-4 rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 transition-all text-left group"
+                      onClick={() => isPaidUser ? setShowTrainingPlan(true) : setShowPaywall(true)}
+                      className={`relative flex flex-col items-center gap-2 p-4 rounded-xl transition-all text-center group ${
+                        isPaidUser
+                          ? "bg-gradient-to-br from-primary-50 to-primary-100 dark:from-primary-900/30 dark:to-primary-800/30 hover:shadow-md"
+                          : "bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700"
+                      }`}
                     >
-                      <div className="w-12 h-12 rounded-xl bg-white dark:bg-slate-800 shadow-sm flex items-center justify-center">
-                        <Calendar className="w-6 h-6 text-slate-400 dark:text-slate-500" />
+                      <div className={`w-12 h-12 rounded-xl shadow-sm flex items-center justify-center ${
+                        isPaidUser ? "bg-primary-500" : "bg-white dark:bg-slate-800"
+                      }`}>
+                        <Calendar className={`w-6 h-6 ${isPaidUser ? "text-white" : "text-slate-400 dark:text-slate-500"}`} />
                       </div>
-                      <div className="flex-1">
-                        <div className="font-semibold text-slate-500 dark:text-slate-400">Race Week Planner</div>
-                        <div className="text-sm text-slate-400 dark:text-slate-500">7-day nutrition guide</div>
+                      <div>
+                        <div className={`font-semibold text-sm ${isPaidUser ? "text-primary-700 dark:text-primary-300" : "text-slate-500 dark:text-slate-400"}`}>Training Plan</div>
+                        <div className={`text-xs ${isPaidUser ? "text-primary-500 dark:text-primary-400" : "text-slate-400 dark:text-slate-500"}`}>With fueling</div>
                       </div>
-                      <Lock className="w-4 h-4 text-slate-400 dark:text-slate-500" />
+                      {!isPaidUser && <Lock className="w-3 h-3 text-slate-400 dark:text-slate-500 absolute top-2 right-2" />}
                     </button>
 
                     <button
-                      onClick={() => setShowPaywall(true)}
-                      className="relative flex items-center gap-3 p-4 rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700 transition-all text-left group"
+                      onClick={() => isPaidUser ? setShowRaceWeekPlanner(true) : setShowPaywall(true)}
+                      className={`relative flex flex-col items-center gap-2 p-4 rounded-xl transition-all text-center group ${
+                        isPaidUser
+                          ? "bg-gradient-to-br from-warning-50 to-warning-100 dark:from-warning-900/30 dark:to-warning-800/30 hover:shadow-md"
+                          : "bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700"
+                      }`}
                     >
-                      <div className="w-12 h-12 rounded-xl bg-white dark:bg-slate-800 shadow-sm flex items-center justify-center">
-                        <CheckSquare className="w-6 h-6 text-slate-400 dark:text-slate-500" />
+                      <div className={`w-12 h-12 rounded-xl shadow-sm flex items-center justify-center ${
+                        isPaidUser ? "bg-warning-500" : "bg-white dark:bg-slate-800"
+                      }`}>
+                        <Clock className={`w-6 h-6 ${isPaidUser ? "text-white" : "text-slate-400 dark:text-slate-500"}`} />
                       </div>
-                      <div className="flex-1">
-                        <div className="font-semibold text-slate-500 dark:text-slate-400">Packing Checklist</div>
-                        <div className="text-sm text-slate-400 dark:text-slate-500">Race day essentials</div>
+                      <div>
+                        <div className={`font-semibold text-sm ${isPaidUser ? "text-warning-700 dark:text-warning-300" : "text-slate-500 dark:text-slate-400"}`}>Race Week</div>
+                        <div className={`text-xs ${isPaidUser ? "text-warning-500 dark:text-warning-400" : "text-slate-400 dark:text-slate-500"}`}>Nutrition plan</div>
                       </div>
-                      <Lock className="w-4 h-4 text-slate-400 dark:text-slate-500" />
+                      {!isPaidUser && <Lock className="w-3 h-3 text-slate-400 dark:text-slate-500 absolute top-2 right-2" />}
+                    </button>
+
+                    <button
+                      onClick={() => isPaidUser ? setShowPackingChecklist(true) : setShowPaywall(true)}
+                      className={`relative flex flex-col items-center gap-2 p-4 rounded-xl transition-all text-center group ${
+                        isPaidUser
+                          ? "bg-gradient-to-br from-success-50 to-success-100 dark:from-success-900/30 dark:to-success-800/30 hover:shadow-md"
+                          : "bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700"
+                      }`}
+                    >
+                      <div className={`w-12 h-12 rounded-xl shadow-sm flex items-center justify-center ${
+                        isPaidUser ? "bg-success-500" : "bg-white dark:bg-slate-800"
+                      }`}>
+                        <CheckSquare className={`w-6 h-6 ${isPaidUser ? "text-white" : "text-slate-400 dark:text-slate-500"}`} />
+                      </div>
+                      <div>
+                        <div className={`font-semibold text-sm ${isPaidUser ? "text-success-700 dark:text-success-300" : "text-slate-500 dark:text-slate-400"}`}>Packing List</div>
+                        <div className={`text-xs ${isPaidUser ? "text-success-500 dark:text-success-400" : "text-slate-400 dark:text-slate-500"}`}>Race essentials</div>
+                      </div>
+                      {!isPaidUser && <Lock className="w-3 h-3 text-slate-400 dark:text-slate-500 absolute top-2 right-2" />}
+                    </button>
+
+                    <button
+                      onClick={() => isPaidUser ? setShowGutTraining(true) : setShowPaywall(true)}
+                      className={`relative flex flex-col items-center gap-2 p-4 rounded-xl transition-all text-center group ${
+                        isPaidUser
+                          ? "bg-gradient-to-br from-accent-50 to-accent-100 dark:from-accent-900/30 dark:to-accent-800/30 hover:shadow-md"
+                          : "bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-800 dark:to-slate-700"
+                      }`}
+                    >
+                      <div className={`w-12 h-12 rounded-xl shadow-sm flex items-center justify-center ${
+                        isPaidUser ? "bg-accent-500" : "bg-white dark:bg-slate-800"
+                      }`}>
+                        <Activity className={`w-6 h-6 ${isPaidUser ? "text-white" : "text-slate-400 dark:text-slate-500"}`} />
+                      </div>
+                      <div>
+                        <div className={`font-semibold text-sm ${isPaidUser ? "text-accent-700 dark:text-accent-300" : "text-slate-500 dark:text-slate-400"}`}>Gut Training</div>
+                        <div className={`text-xs ${isPaidUser ? "text-accent-500 dark:text-accent-400" : "text-slate-400 dark:text-slate-500"}`}>6-week protocol</div>
+                      </div>
+                      {!isPaidUser && <Lock className="w-3 h-3 text-slate-400 dark:text-slate-500 absolute top-2 right-2" />}
                     </button>
                   </div>
-                  <p className="text-xs text-slate-500 dark:text-slate-400 text-center mt-3">
-                    Unlock with any paid plan to access race prep tools
-                  </p>
+                  {!isPaidUser && (
+                    <p className="text-xs text-slate-500 dark:text-slate-400 text-center mt-3">
+                      Unlock with any paid plan to access race prep tools
+                    </p>
+                  )}
                 </Card>
 
                 {/* Action Buttons - Only show for non-paywalled or demo */}
@@ -787,7 +877,7 @@ export default function CalculatorPage() {
                 </li>
                 <li className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
                   <Check className="w-4 h-4 text-success-500" />
-                  Printable race cards
+                  Training plan with fueling
                 </li>
                 <li className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
                   <Check className="w-4 h-4 text-success-500" />
@@ -795,7 +885,11 @@ export default function CalculatorPage() {
                 </li>
                 <li className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
                   <Check className="w-4 h-4 text-success-500" />
-                  Packing checklist generator
+                  6-week gut training protocol
+                </li>
+                <li className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
+                  <Check className="w-4 h-4 text-success-500" />
+                  Printable race cards
                 </li>
               </ul>
               <Link href="/pricing" className="block">
@@ -824,11 +918,11 @@ export default function CalculatorPage() {
                 </li>
                 <li className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
                   <Check className="w-4 h-4 text-success-500" />
-                  All race prep tools included
+                  Training plans with fueling
                 </li>
                 <li className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
                   <Check className="w-4 h-4 text-success-500" />
-                  Product recommendations
+                  All race prep tools included
                 </li>
                 <li className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-400">
                   <Check className="w-4 h-4 text-success-500" />
@@ -918,6 +1012,33 @@ export default function CalculatorPage() {
               fuelType={formData.fuelType || "gels"}
               raceName={selectedRace?.name}
               onClose={() => setShowPackingChecklist(false)}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Gut Training Protocol Modal */}
+      {showGutTraining && result && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
+          <div className="w-full max-w-3xl">
+            <GutTrainingProtocol
+              targetCarbsPerHour={result.chosenCarbsPerHourTarget}
+              onClose={() => setShowGutTraining(false)}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Training Plan Modal */}
+      {showTrainingPlan && result && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in">
+          <div className="w-full max-w-4xl">
+            <TrainingPlan
+              raceDistance={formData.distance || 26.2}
+              goalTimeMinutes={formData.goalTimeMinutes || 240}
+              raceName={selectedRace?.name}
+              carbTargetPerHour={result.chosenCarbsPerHourTarget}
+              onClose={() => setShowTrainingPlan(false)}
             />
           </div>
         </div>
