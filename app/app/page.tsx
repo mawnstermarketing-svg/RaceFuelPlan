@@ -35,9 +35,9 @@ export default async function DashboardPage() {
   return (
     <DashboardContent
       user={{
-        name: session.user.name,
+        name: undefined,
         email: session.user.email,
-        image: session.user.image,
+        image: undefined,
       }}
       plans={plans.map((p) => ({
         ...p,

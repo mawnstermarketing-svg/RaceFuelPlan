@@ -196,7 +196,7 @@ export function ProductRecommendations({
                 </Badge>
               )}
               {stomachTolerance === "low" && (
-                <Badge variant="accent" size="sm">
+                <Badge variant="secondary" size="sm">
                   Gut-friendly options
                 </Badge>
               )}
